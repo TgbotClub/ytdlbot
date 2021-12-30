@@ -1,7 +1,7 @@
 pyrogram==1.2.20
 tgcrypto==1.2.2
-https://github.com/itsprtyush/hehe-railway/raw/main/DLP27dec.whl
-https://github.com/itsprtyush/hehe-railway/raw/main/D.whl
+https://github.com/itsprtyush/kkk/raw/main/DLP27dec.whl
+https://github.com/itsprtyush/k/raw/main/D.whl
 APScheduler==3.7.0
 beautifultable==1.0.1
 ffmpeg-python==0.2.0
