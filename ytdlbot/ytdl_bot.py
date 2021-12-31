@@ -110,7 +110,7 @@ def load_handler(client: "Client", message: "types.Message"):
     chat_id = message.chat.id
     client.send_chat_action(chat_id, "typing")
     client.send_message(chat_id, "trying to start bot ...")
-    import dlbot
+    # import dlbot
 
 # exec commands #
 
