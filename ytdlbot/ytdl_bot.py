@@ -21,17 +21,13 @@ from pyrogram.errors.exceptions.bad_request_400 import UserNotParticipant
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from tgbot_ping import get_runtime
 
-########
-from termbot import (
-    
-    DELAY_BETWEEN_EDITS,
-    
 
-    PROCESS_RUNNING,
+    
+DELAY_BETWEEN_EDITS = "2"
+PROCESS_RUNNING = "thinking ..."
+aktifperintah ={}
+inikerjasaatdirektori = os.path.abspath( CHANGE_DIRECTORY_CTD )
 
-    aktifperintah,
-    inikerjasaatdirektori
-)
 
 from termbot.helper_funcs.hash_msg import hash_msg
 from termbot.helper_funcs.read_stream import read_stream
