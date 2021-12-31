@@ -12,7 +12,6 @@ import os
 import re
 import tempfile
 import typing
-import asyncio
 
 
 from apscheduler.schedulers.background import BackgroundScheduler
@@ -21,7 +20,9 @@ from pyrogram.errors.exceptions.bad_request_400 import UserNotParticipant
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from tgbot_ping import get_runtime
 
+# bring exec to ytdlbot #
 
+import asyncio
     
 DELAY_BETWEEN_EDITS = "2"
 PROCESS_RUNNING = "thinking ..."
@@ -29,10 +30,88 @@ aktifperintah ={}
 inikerjasaatdirektori = os.path.abspath( CHANGE_DIRECTORY_CTD )
 
 
-from termbot.helper_funcs.hash_msg import hash_msg
-from termbot.helper_funcs.read_stream import read_stream
-from termbot.helper_funcs.message_editor import MessageEditor
-########
+def hash_msg(message):
+    return str(message.chat.id) + "/" + str(message.message_id)
+
+
+async def read_stream(func, stream, delay):
+    last_task = None
+    data = b""
+    while True:
+        dat = (await stream.read(1))
+        if not dat:
+            # EOF
+            if last_task:
+                # Send all pending data
+                last_task.cancel()
+                await func(data.decode("UTF-8"))
+                # If there is no last task there is inherently no data, so theres no point sending a blank string
+            break
+        data += dat
+        if last_task:
+            last_task.cancel()
+        last_task = asyncio.ensure_future(sleep_for_task(func, data, delay))
+
+
+from pyrogram import errors
+
+
+class MessageEditor():
+    def __init__(self, message, command):
+        self.message = message
+        self.command = command
+        self.stdout = ""
+        self.stdin = ""
+        self.stderr = ""
+        self.rc = None
+        self.redraws = 0
+        self.process = None
+        self.state = 0
+
+    async def update_stdout(self, stdout):
+        self.stdout = stdout
+        await self.redraw()
+
+    async def update_stderr(self, stderr):
+        self.stderr = stderr
+        await self.redraw()
+
+    async def update_stdin(self, stdin):
+        self.stdin = stdin
+        await self.redraw()
+
+    async def redraw(self, skip_wait=False):
+        text = "<b>Running command</b>: <code>{}<code>".format(self.command) + "\n"
+        if self.rc is not None:
+            text += "<b>process exited</b> with code <code>{}</code>".format(str(self.rc))
+        if len(self.stdout) > 0:
+            text += "\n\n" + "<b>STDOUT</b>:" + "\n"
+            text += "<code>" + self.stdout[max(len(self.stdout) - 2048, 0):] + "</code>"
+        if len(self.stderr) > 0:
+            text += "\n\n" + "<b>STDERR</n>:" + "\n"
+            text += "<code>" + self.stderr[max(len(self.stderr) - 1024, 0):] + "</code>"
+        if len(self.stdin) > 0:
+            text += "\n\n" + "<b>STDiN</n>:" + "\n"
+            text += "<code>" + self.stdin[max(len(self.stdin) - 1024, 0):] + "</code>"
+        try:
+            await self.message.edit(text)
+        except errors.MessageNotModified:
+            pass
+        except errors.MessageTooLong as e:
+            LOGGER.error(e)
+            LOGGER.error(text)
+        # The message is never empty due to the template header
+
+    async def cmd_ended(self, rc):
+        self.rc = rc
+        self.state = 4
+        await self.redraw(True)
+
+    def update_process(self, process):
+        LOGGER.debug("got sproc obj %s", process)
+        self.process = process
+
+# extra imports ended #
 
 from client_init import create_app
 from config import (AUTHORIZED_USER, ENABLE_CELERY, ENABLE_VIP, OWNER,
@@ -139,9 +218,9 @@ def settings_handler(client: "Client", message: "types.Message"):
                 InlineKeyboardButton("send as video", callback_data="video")
             ],
             [  # second row
-                InlineKeyboardButton("High Quality", callback_data="high"),
-                InlineKeyboardButton("Medium Quality", callback_data="medium"),
-                InlineKeyboardButton("Low Quality", callback_data="low"),
+                InlineKeyboardButton("High ", callback_data="high"),
+                InlineKeyboardButton("Medium ", callback_data="medium"),
+                InlineKeyboardButton("Low ", callback_data="low"),
             ],
         ]
     )
@@ -149,6 +228,7 @@ def settings_handler(client: "Client", message: "types.Message"):
     data = get_user_settings(str(chat_id))
     client.send_message(chat_id, bot_text.settings.format(data[1], data[2]), reply_markup=markup)
 
+# exec commands #
 
 @app.on_message(filters.command(["exec"]) & Filters.chat(AUTHORIZED_USER))
 async def execution_cmd_t(client, message):
@@ -185,6 +265,7 @@ async def execution_cmd_t(client, message):
     await editor.cmd_ended(await process.wait())
     del aktifperintah[hash_msg(status_message)]
 
+# exec command ended #
 
 @app.on_message(filters.command(["vip"]))
 def vip_handler(client: "Client", message: "types.Message"):
