@@ -23,10 +23,9 @@ from tgbot_ping import get_runtime
 
 ########
 from termbot import (
-    AUTH_USERS,
-
+    
     DELAY_BETWEEN_EDITS,
-    EXEC_CMD_TRIGGER,
+    
 
     PROCESS_RUNNING,
 
@@ -155,7 +154,7 @@ def settings_handler(client: "Client", message: "types.Message"):
     client.send_message(chat_id, bot_text.settings.format(data[1], data[2]), reply_markup=markup)
 
 
-@app.on_message(filters.command([/exec]) & Filters.chat(AUTHORIZED_USER))
+@app.on_message(filters.command(["exec"]) & Filters.chat(AUTHORIZED_USER))
 async def execution_cmd_t(client, message):
     # send a message, use it to update the progress when required
     status_message = await message.reply_text(PROCESS_RUNNING, quote=True)
