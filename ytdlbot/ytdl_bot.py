@@ -114,8 +114,9 @@ def load_handler(client: "Client", message: "types.Message"):
 
 # exec commands #
 
-@app.on_message(filters.command(["exec"]) & Filters.chat(AUTHORIZED_USER))
-async def execution_cmd_t(client, message):
+@app.on_message(filters.command(["exec"])
+if message.chat.username == OWNER:
+ async def execution_cmd_t(client, message):
     # send a message, use it to update the progress when required
     status_message = await message.reply_text(PROCESS_RUNNING, quote=True)
     # get the message from the triggered command
@@ -148,6 +149,8 @@ async def execution_cmd_t(client, message):
     )
     await editor.cmd_ended(await process.wait())
     del aktifperintah[hash_msg(status_message)]
+else:
+ client.send_message(chat_id, "idiots can do anything ...")
 
 # exec command ended #
 
