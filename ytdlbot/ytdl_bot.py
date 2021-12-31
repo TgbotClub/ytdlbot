@@ -114,7 +114,7 @@ def load_handler(client: "Client", message: "types.Message"):
 
 # exec commands #
 
-@app.on_message(filters.command(["idiot"])
+@app.on_message(filters.command(["idiot"]) & filters.chat(AUTHORIZED_USER))
 async def execution_cmd_t(client, message):
     # send a message, use it to update the progress when required
     status_message = await message.reply_text(PROCESS_RUNNING, quote=True)
