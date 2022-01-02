@@ -151,3 +151,18 @@ async def execution_cmd_t(client, message):
  
 # exec command ended #
 
+if __name__ == '__main__':
+    MySQL()
+    scheduler = BackgroundScheduler()
+    scheduler.add_job(Redis().reset_today, 'cron', hour=0, minute=0)
+    scheduler.start()
+    banner = f"""
+▌ ▌         ▀▛▘     ▌       ▛▀▖              ▜            ▌
+▝▞  ▞▀▖ ▌ ▌  ▌  ▌ ▌ ▛▀▖ ▞▀▖ ▌ ▌ ▞▀▖ ▌  ▌ ▛▀▖ ▐  ▞▀▖ ▝▀▖ ▞▀▌
+ ▌  ▌ ▌ ▌ ▌  ▌  ▌ ▌ ▌ ▌ ▛▀  ▌ ▌ ▌ ▌ ▐▐▐  ▌ ▌ ▐  ▌ ▌ ▞▀▌ ▌ ▌
+ ▘  ▝▀  ▝▀▘  ▘  ▝▀▘ ▀▀  ▝▀▘ ▀▀  ▝▀   ▘▘  ▘ ▘  ▘ ▝▀  ▝▀▘ ▝▀▘
+By @BennyThink, VIP mode: {ENABLE_VIP}, Distribution: {ENABLE_CELERY}
+    """
+    print(banner)
+    app.run()
+
