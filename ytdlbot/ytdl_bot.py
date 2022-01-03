@@ -1,7 +1,6 @@
 import asyncio
 import logging
 import typing
-import 
 from apscheduler.schedulers.background import BackgroundScheduler
 from db import MySQL, Redis
 from client_init import create_app
